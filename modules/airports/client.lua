@@ -1,14 +1,49 @@
-local Interact = false
+Interact = false
 
-function StartNPCFlight(index)
+function StartNPCFlight(from, index)
     ServerCallback("pickle_airport:startNPCFlight", function(result)
         if (result) then 
+            local Plane = nil
+            local airport_cfg = Config.Airports[from]
             local cfg = Config.Airports[index]
             local coords = cfg.Locations.Boarding
             local ped = PlayerPedId()
             DoScreenFadeOut(1000)
+            Wait(1400)
+            local data = Flight
+            local start, finish, board = airport_cfg.Locations.Flight, cfg.Locations.Flight, cfg.Locations.Boarding
+            
+            start, finish = vec3(start.x, start.y, 1700.0), vec3(finish.x, finish.y, 1700.0)
+
+            SetEntityCoords(ped, start.x, start.y, start.z)
+            
+            Wait(100)
+
+            local heading = GetHeadingFromVector_2d(start.x - finish.x, start.y - finish.y)
+            local ped = CreateNPC(`g_m_m_armboss_01`, start.x, start.y, start.z, 0.0, true, true)
+
+            Plane = CreateVeh(`luxor`, start.x, start.y, start.z, heading - 180.0, false, true)
+            
+            TaskWarpPedIntoVehicle(ped, Plane, -1)
+            TaskWarpPedIntoVehicle(PlayerPedId(), Plane, 1)
+        
+            Wait(100)
+            DoScreenFadeIn(1000)
+            
+            local percent = 0
+            while percent < 1.0 do
+                percent = percent + 0.0005
+                local coords = lerp(start, finish, percent)
+                SetEntityCoords(Plane, coords.x, coords.y, coords.z)
+                DisableControlAction(1, 75, 1)
+                Wait(0)
+            end
+            FreezeEntityPosition(Plane, true)
+            DoScreenFadeOut(1000)
             Wait(1500)
-            SetEntityCoords(ped, coords.x, coords.y, coords.z)
+            DeleteEntity(Plane)
+            SetEntityCoords(PlayerPedId(), board.x, board.y, board.z)
+                
             Wait(100)
             DoScreenFadeIn(1000)
         else
@@ -125,6 +160,31 @@ function OpenSpawnMenu(index)
     lib.showMenu(menu_id)
 end
 
+function ShowHangarMenu(index)
+    local menu_id = "airport_hangar_menu"
+    local options = {
+        {label = "Aircraft Spawner", description = ""},
+        {label = "Mission Selector", description = ""},
+    }
+    lib.registerMenu({
+        id = menu_id,
+        title = 'Hangar',
+        position = 'top-left',
+        onClose = function(keyPressed)
+            Interact = false
+        end,
+        options = options
+    }, function(selected, scrollIndex, args)
+        if (selected == 1) then 
+            OpenSpawnMenu(index)
+        elseif (selected == 2) then
+            OpenMissionMenu(index)
+        end
+    end)
+
+    lib.showMenu(menu_id)
+end
+
 function OpenNPCMenu(index)
     local menu_id = "airport_npc_menu"
     local options = {}
@@ -143,7 +203,7 @@ function OpenNPCMenu(index)
         end,
         options = options
     }, function(selected, scrollIndex, args)
-        StartNPCFlight(options[selected].index)
+        StartNPCFlight(index, options[selected].index)
     end)
     lib.showMenu(menu_id)
 end
@@ -200,7 +260,7 @@ function InteractAirport(index, key)
             DeleteEntity(vehicle)
             Interact = false
         else
-            OpenSpawnMenu(index)
+            ShowHangarMenu(index)
         end
     end
 end

@@ -2,6 +2,8 @@ Config = {}
 
 Config.Debug = true
 
+Config.MissionCommand = true
+
 Config.Blips = {}
 
 Config.Tracker = {
@@ -114,6 +116,15 @@ Config.Missions = {
                 {name = "money", min = 300, max = 500}
             }
         },
+    }
+}
+
+Config.MissionTypes = {
+    Passenger = {
+        Model = `shamal`
+    },
+    Delivery = {
+        Model = `titan`
     }
 }
 

@@ -42,16 +42,12 @@ function RemoveItem(source, name, amount)
     end
 end
 
-function CanCarryItem(source, name, amount)
-    return true -- No function for this.
-end
-
 function RegisterUsableItem(...)
     QBCore.Functions.CreateUseableItem(...)
 end
 
 function PermissionCheck(source, perm)
-    local job = QBCore.Functions.GetPlayer(source).job
+    local job = QBCore.Functions.GetPlayer(source).PlayerData.job
     if (perm == "flight") then 
         return (job.name == "airport")
     elseif (perm == "pilot_mission") then 

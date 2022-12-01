@@ -234,12 +234,35 @@ function StopMission()
     SetMissionBlip()
 end
 
-function StartMission(lastIndex, vehicle)
-    local vehicle = vehicle or GetCurrentAircraft()
-    if not vehicle then 
-        ShowNotification("You cannot start a mission without being in a aircraft.")
-    elseif MissionIndex == nil then 
-        local index = GetRandomInt(1, #Config.Missions.Sequences, lastIndex)
+function StartMission(Type)
+    local vehicle = (Config.MissionCommand and GetCurrentAircraft() or nil)
+    if MissionIndex == nil then 
+        if not vehicle then 
+            if (Type and Config.MissionTypes[Type]) then 
+                local model = Config.MissionTypes[Type].Model
+                local coords, heading = GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId())
+                vehicle = CreateVeh(model, coords.x, coords.y, coords.z, heading, true, true)
+                TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+                Wait(100)
+            else
+                ShowNotification("You cannot start a mission without being in a aircraft.")
+                return
+            end
+        end
+        local index = GetRandomInt(1, #Config.Missions.Sequences)
+        if Type then 
+            for i=1, 10 do 
+                if Config.Missions.Sequences[index].Type ~= Type then
+                    index = GetRandomInt(1, #Config.Missions.Sequences)
+                else
+                    break
+                end
+            end
+            if Config.Missions.Sequences[index].Type ~= Type then 
+                ShowNotification("There are no missions for this category.")
+                return
+            end
+        end
         MissionIndex = index
         MissionAircraft = vehicle
         local mission = Config.Missions.Sequences[MissionIndex]
@@ -269,10 +292,39 @@ function StartMission(lastIndex, vehicle)
     end
 end
 
-RegisterCommand("pilotmission", function()
-    if (PermissionCheck("pilot_mission")) then 
-        StartMission()
-    else
-        ShowNotification(U.permission_denied)
-    end
-end)
+function OpenMissionMenu(index)
+    local menu_id = "airport_mission_menu"
+    local options = {
+        {label = "Passenger Flights", description = ""},
+        {label = "Package Delivery", description = ""},
+    }
+    lib.registerMenu({
+        id = menu_id,
+        title = 'Aircraft Spawner',
+        position = 'top-left',
+        onClose = function(keyPressed)
+            Interact = false
+        end,
+        options = options
+    }, function(selected, scrollIndex, args)
+        Interact = false
+        if (selected == 1) then 
+            StartMission("Passenger")
+        elseif (selected == 2) then
+            StartMission("Delivery")
+        end
+    end)
+
+    lib.showMenu(menu_id)
+end
+
+if Config.MissionCommand then 
+    RegisterCommand("pilotmission", function()
+        if (PermissionCheck("pilot_mission")) then 
+            StartMission()
+        else
+            ShowNotification(U.permission_denied)
+        end
+    end)
+end
+

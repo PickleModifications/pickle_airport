@@ -42,11 +42,6 @@ function RemoveItem(source, name, amount)
     end
 end
 
-function CanCarryItem(source, name, amount)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    return xPlayer.canCarryItem(name, amount)
-end
-
 function RegisterUsableItem(...)
     ESX.RegisterUsableItem(...)
 end
