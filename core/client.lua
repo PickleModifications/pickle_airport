@@ -3,6 +3,9 @@ function CreateVeh(modelHash, ...)
     while not HasModelLoaded(modelHash) do Wait(0) end
     local veh = CreateVehicle(modelHash, ...)
     SetModelAsNoLongerNeeded(modelHash)
+    if (GiveKeys) then 
+        GiveKeys(veh)
+    end
     return veh
 end
 
