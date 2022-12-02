@@ -2,6 +2,10 @@ if GetResourceState('qb-core') ~= 'started' then return end
 
 QBCore = exports['qb-core']:GetCoreObject()
 
+function GiveKeys(vehicle) 
+	TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(vehicle))
+end
+
 function ShowNotification(text)
 	QBCore.Functions.Notify(text)
 end
