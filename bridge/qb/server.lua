@@ -12,7 +12,7 @@ end
 
 function Search(source, name)
     local xPlayer = QBCore.Functions.GetPlayer(source)
-    if name ~= "money" then 
+    if name ~= "money" and name ~= "cash" then 
         local item = xPlayer.Functions.GetItemByName(name)
         if item ~= nil then 
             return item.amount
@@ -26,7 +26,7 @@ end
 
 function AddItem(source, name, amount)
     local xPlayer = QBCore.Functions.GetPlayer(source)
-    if name == "money" then 
+    if name == "money" or name == "cash" then 
         return xPlayer.Functions.AddMoney("cash", amount)
     else
         return xPlayer.Functions.AddItem(name, amount)
@@ -35,7 +35,7 @@ end
 
 function RemoveItem(source, name, amount)
     local xPlayer = QBCore.Functions.GetPlayer(source)
-    if name == "money" then 
+    if name == "money" or name == "cash" then 
         return xPlayer.Functions.RemoveMoney("cash", amount)
     else
         return xPlayer.Functions.RemoveItem(name, amount)
