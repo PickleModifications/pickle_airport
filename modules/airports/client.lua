@@ -15,9 +15,6 @@ function StartNPCFlight(from, index)
             
             start, finish = vec3(start.x, start.y, 1700.0), vec3(finish.x, finish.y, 1700.0)
 
-
-            Wait(100)
-
             local heading = GetHeadingFromVector_2d(start.x - finish.x, start.y - finish.y)
             local ped = CreateNPC(`g_m_m_armboss_01`, start.x, start.y, start.z, 0.0, true, true)
 
