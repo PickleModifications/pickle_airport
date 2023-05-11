@@ -15,15 +15,11 @@ function StartNPCFlight(from, index)
             
             start, finish = vec3(start.x, start.y, 1700.0), vec3(finish.x, finish.y, 1700.0)
 
-            SetEntityCoords(ped, start.x, start.y, start.z)
-            
-            Wait(100)
-
             local heading = GetHeadingFromVector_2d(start.x - finish.x, start.y - finish.y)
             local ped = CreateNPC(`g_m_m_armboss_01`, start.x, start.y, start.z, 0.0, true, true)
 
             Plane = CreateVeh(`luxor`, start.x, start.y, start.z, heading - 180.0, false, true)
-            
+            SetEntityCoords(ped, start.x, start.y, start.z)
             TaskWarpPedIntoVehicle(ped, Plane, -1)
             TaskWarpPedIntoVehicle(PlayerPedId(), Plane, 1)
         
